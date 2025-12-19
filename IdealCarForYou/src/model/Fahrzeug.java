@@ -1,8 +1,9 @@
 package model;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public abstract class Fahrzeug {
+public abstract class Fahrzeug implements Serializable {
     private int fahrzeugId;
     private String marke;
     private String modell;

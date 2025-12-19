@@ -1,6 +1,8 @@
 package model;
 
-public class Auto extends Fahrzeug {
+import java.io.Serializable;
+
+public class Auto extends Fahrzeug implements Serializable {
     private AufbauArt aufbauArt;
     private boolean navigation;
 

@@ -1,6 +1,8 @@
 package model;
 
-public class Benutzer {
+import java.io.Serializable;
+
+public class Benutzer implements Serializable {
     private String benutzername;
     private Rolle rolle;
 
