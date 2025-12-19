@@ -34,6 +34,17 @@ public class CarManageModel {
         fahrzeuge.remove(fahrzeug);
     }
 
+    public List<Fahrzeug> sucheFahrzeug(String marke, String modell) {
+        List<Fahrzeug> result = new ArrayList<>();
+
+        for (Fahrzeug f : fahrzeuge) {
+            if (f.getMarke().equalsIgnoreCase(marke) && f.getModell().equalsIgnoreCase(modell)) {
+                result.add(f);
+            }
+        }
+        return result;
+    }
+
 
     public int getNextKundenId() {
         return kundenIdCounter++;

@@ -21,6 +21,10 @@ public abstract class Fahrzeug {
         this.modell = modell;
     }
 
+    public String toString() {
+        return fahrzeugId + " - " + marke + " - " + modell;
+    }
+
 
     public int getFahrzeugId() {
         return fahrzeugId;
