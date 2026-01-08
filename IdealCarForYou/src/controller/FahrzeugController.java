@@ -17,14 +17,16 @@ public class FahrzeugController {
     }
 
     public void addFahrzeug(Fahrzeug fahrzeug) {
-        if (aktuellerBenutzer.getRolle() != Rolle.FAHRZEUGMANAGER) {
+        if (aktuellerBenutzer.getRolle() != Rolle.FAHRZEUGMANAGER &&
+            aktuellerBenutzer.getRolle() != Rolle.ADMIN) {
             throw new SecurityException("Keine Berechtigung");
         }
         model.addFahrzeug(fahrzeug);
     }
 
     public void deleteFahrzeug(Fahrzeug fahrzeug) {
-        if (aktuellerBenutzer.getRolle() != Rolle.FAHRZEUGMANAGER) {
+        if (aktuellerBenutzer.getRolle() != Rolle.FAHRZEUGMANAGER ||
+                aktuellerBenutzer.getRolle() != Rolle.ADMIN) {
             throw new SecurityException("Keine Berechtigung");
         }
         model.deleteFahrzeug(fahrzeug);

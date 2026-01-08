@@ -15,7 +15,7 @@ public class Main {
         model.getBenutzer().addAll(adminRepo.loadBenutzer());
 
         Benutzer admin = new Benutzer("Admin", Rolle.ADMIN);
-        Benutzer manager = new Benutzer("Fahrzeugpark Manager", Rolle.FAHRZEUGMANAGER);
+        Benutzer manager = new Benutzer("Fahrzeugpark Manager", Rolle.ADMIN);
 
         FahrzeugController fahrzeugController = new FahrzeugController(model, manager, fahrzeugRepo);
         KundenController kundenController = new KundenController(model, manager, kundenRepo);

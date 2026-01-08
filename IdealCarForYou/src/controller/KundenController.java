@@ -17,16 +17,10 @@ public class KundenController {
     }
 
     public void addKunde(Kunde kunde) {
-        if (aktuellerBenutzer.getRolle() != Rolle.FAHRZEUGMANAGER) {
-            throw new SecurityException("Keine Berechtigung");
-        }
         model.addKunde(kunde);
     }
 
     public void deleteKunde(Kunde kunde) {
-        if (aktuellerBenutzer.getRolle() != Rolle.FAHRZEUGMANAGER) {
-            throw new SecurityException("Keine Berechtigung");
-        }
         model.deleteKunde(kunde);
     }
 
