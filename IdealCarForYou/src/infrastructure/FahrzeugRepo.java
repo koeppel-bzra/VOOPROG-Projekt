@@ -13,10 +13,6 @@ public class FahrzeugRepo {
     private static final String FILE = "fahrzeuge.json";
     private ObjectMapper mapper = new ObjectMapper();
 
-    public FahrzeugRepo() {
-        mapper.writerWithDefaultPrettyPrinter();
-    }
-
     public List<Fahrzeug> loadFahrzeuge() {
         try {
             File file = new File(FILE);

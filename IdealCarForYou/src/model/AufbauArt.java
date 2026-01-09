@@ -1,9 +1,9 @@
 package model;
 
 public enum AufbauArt {
-    KLEINWAGEN,
+    Kleinwagen,
     SUV,
-    KOMBI,
-    CABRIOLET,
-    LIMOUSINE
+    Kombi,
+    Cabriolet,
+    Limousine
 }

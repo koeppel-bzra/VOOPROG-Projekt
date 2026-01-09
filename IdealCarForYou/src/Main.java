@@ -20,8 +20,8 @@ public class Main {
         FahrzeugController fahrzeugController = new FahrzeugController(model, manager, fahrzeugRepo);
         KundenController kundenController = new KundenController(model, manager, kundenRepo);
 
-        Auto auto = new Auto(model.getNextFahrzeugId(), "BMW", "X5", AufbauArt.KLEINWAGEN, true);
-        Auto auto2 = new Auto(model.getNextFahrzeugId(), "Porsche", "M1", AufbauArt.LIMOUSINE, false);
+        Auto auto = new Auto(model.getNextFahrzeugId(), "BMW", "X5", AufbauArt.Kleinwagen, true);
+        Auto auto2 = new Auto(model.getNextFahrzeugId(), "Porsche", "M1", AufbauArt.Limousine, false);
         fahrzeugController.addFahrzeug(auto);
         fahrzeugController.addFahrzeug(auto2);
 

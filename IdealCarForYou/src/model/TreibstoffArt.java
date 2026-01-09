@@ -1,7 +1,7 @@
 package model;
 
 public enum TreibstoffArt {
-    BENZIN,
-    DIESEL,
-    ELEKTRISCH
+    Benzin,
+    Diesel,
+    Elektrisch
 }
