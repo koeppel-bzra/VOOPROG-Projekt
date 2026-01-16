@@ -1,200 +1,279 @@
 package view;
 
-import model.AufbauArt;
-import model.Navigationssystem;
-import model.TreibstoffArt;
+import model.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class MainFrame {
+
     public static void main(String[] args) {
+
+        // FRAME + MODEL
         JFrame frame = new JFrame("IdealCar4You");
         frame.setSize(1000, 600);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
-        // Top Label
+        CarManageModel model = new CarManageModel();
+
+        // TOP TITLE
         JLabel lblTop = new JLabel("IdealCar4You - Verwaltung", SwingConstants.CENTER);
         lblTop.setFont(new Font("Arial", Font.BOLD, 20));
         frame.add(lblTop, BorderLayout.NORTH);
 
-        // Navigation links
+        // NAVIGATION (LEFT)
         JPanel pnlNav = new JPanel();
-        pnlNav.setLayout(new GridLayout(5, 1, 5, 5));
-        JButton btnFahrzeuge = new JButton("Fahrzeuge");
-        JButton btnKunden = new JButton("Kunden");
+        pnlNav.setLayout(new BoxLayout(pnlNav, BoxLayout.Y_AXIS));
+
+        JButton btnFahrzeuge = new JButton("Fahrzeuge ⬇");
+        JButton btnAddAuto = new JButton("Auto hinzufügen");
+        JButton btnAddTransporter = new JButton("Transporter hinzufügen");
+
+        JPanel pnlSub = new JPanel();
+        pnlSub.setLayout(new BoxLayout(pnlSub, BoxLayout.Y_AXIS));
+        pnlSub.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
+        pnlSub.add(btnAddAuto);
+        pnlSub.add(btnAddTransporter);
+
+        btnFahrzeuge.addActionListener(e -> {
+            pnlSub.setVisible(!pnlSub.isVisible());
+        });
+
         pnlNav.add(btnFahrzeuge);
-        pnlNav.add(btnKunden);
+        pnlNav.add(pnlSub);
         frame.add(pnlNav, BorderLayout.WEST);
 
-        // Hauptbereich
-        JTextArea txaMain = new JTextArea("Hallo");
-        txaMain.setEditable(false);
-        frame.add(new JScrollPane(txaMain), BorderLayout.CENTER);
+        // LIST (CENTER LEFT)
+        DefaultListModel<Fahrzeug> listModel = new DefaultListModel<>();
+        JList<Fahrzeug> lstFahrzeuge = new JList<>(listModel);
 
-        // Auto-Add-Button unten rechts
-        JPanel pnlBottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        JButton btnAddFahrzeug = new JButton("Auto hinzufügen");
-        pnlBottom.add(btnAddFahrzeug);
-        frame.add(pnlBottom, BorderLayout.SOUTH);
+        // DETAIL BASE PANEL
+        JPanel pnlBase = new JPanel(new GridLayout(0, 2, 5, 5));
+        pnlBase.setBorder(BorderFactory.createTitledBorder("Fahrzeug"));
 
-        // Transporter-Add-Button unten rechts
-        JButton btnAddTransporter = new JButton("Transporter hinzufügen");
-        pnlBottom.add(btnAddTransporter);
+        JLabel lblId = new JLabel("-");
+        JLabel lblMarke = new JLabel("-");
+        JLabel lblModell = new JLabel("-");
+        JLabel lblHubraum = new JLabel("-");
+        JLabel lblTreibstoff = new JLabel("-");
+        JLabel lblKm = new JLabel("-");
+        JLabel lblPs = new JLabel("-");
+        JLabel lblDatum = new JLabel("-");
+        JLabel lblFarbe = new JLabel("-");
+        JLabel lblGewicht = new JLabel("-");
 
+        pnlBase.add(new JLabel("ID:")); pnlBase.add(lblId);
+        pnlBase.add(new JLabel("Marke:")); pnlBase.add(lblMarke);
+        pnlBase.add(new JLabel("Modell:")); pnlBase.add(lblModell);
+        pnlBase.add(new JLabel("Hubraum:")); pnlBase.add(lblHubraum);
+        pnlBase.add(new JLabel("Treibstoff:")); pnlBase.add(lblTreibstoff);
+        pnlBase.add(new JLabel("KM-Stand:")); pnlBase.add(lblKm);
+        pnlBase.add(new JLabel("Leistung (PS):")); pnlBase.add(lblPs);
+        pnlBase.add(new JLabel("Erstzulassung:")); pnlBase.add(lblDatum);
+        pnlBase.add(new JLabel("Aussenfarbe:")); pnlBase.add(lblFarbe);
+        pnlBase.add(new JLabel("Leergewicht:")); pnlBase.add(lblGewicht);
 
-        btnFahrzeuge.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txaMain.setText("Fahrzeuge: ");
+        // AUTO DETAILS
+        JPanel pnlAuto = new JPanel(new GridLayout(0, 2, 5, 5));
+        pnlAuto.setBorder(BorderFactory.createTitledBorder("Auto"));
+
+        JLabel lblAufbau = new JLabel("-");
+        JLabel lblNavigation = new JLabel("-");
+
+        pnlAuto.add(new JLabel("Aufbau:"));
+        pnlAuto.add(lblAufbau);
+        pnlAuto.add(new JLabel("Navigation:"));
+        pnlAuto.add(lblNavigation);
+
+        // TRANSPORTER DETAILS
+        JPanel pnlTransporter = new JPanel(new GridLayout(0, 2, 5, 5));
+        pnlTransporter.setBorder(BorderFactory.createTitledBorder("Transporter"));
+
+        JLabel lblZuladung = new JLabel("-");
+        pnlTransporter.add(new JLabel("Max. Zuladung:"));
+        pnlTransporter.add(lblZuladung);
+
+        // CARD LAYOUT
+        CardLayout cardLayout = new CardLayout();
+        JPanel pnlType = new JPanel(cardLayout);
+        pnlType.add(new JPanel(), "EMPTY");
+        pnlType.add(pnlAuto, "AUTO");
+        pnlType.add(pnlTransporter, "TRANSPORTER");
+
+        pnlType.setPreferredSize(new Dimension(0, 120));
+
+        JPanel pnlDetails = new JPanel();
+        pnlDetails.setLayout(new BoxLayout(pnlDetails, BoxLayout.Y_AXIS));
+        pnlBase.setAlignmentX(Component.LEFT_ALIGNMENT);
+        pnlDetails.add(pnlBase);
+
+        pnlType.setAlignmentX(Component.LEFT_ALIGNMENT);
+        pnlType.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
+        pnlDetails.add(pnlType);
+
+        // SPLIT PANE
+        JSplitPane split = new JSplitPane(
+                JSplitPane.HORIZONTAL_SPLIT,
+                new JScrollPane(lstFahrzeuge),
+                pnlDetails
+        );
+        split.setDividerLocation(500);
+        frame.add(split, BorderLayout.CENTER);
+
+        // LIST SELECTION
+        lstFahrzeuge.addListSelectionListener(e -> {
+            if (e.getValueIsAdjusting()) return;
+
+            Fahrzeug f = lstFahrzeuge.getSelectedValue();
+            if (f == null) {
+                cardLayout.show(pnlType, "EMPTY");
+                return;
+            }
+
+            lblId.setText(String.valueOf(f.getFahrzeugId()));
+            lblMarke.setText(f.getMarke());
+            lblModell.setText(f.getModell());
+            lblHubraum.setText(String.valueOf(f.getHubraum()));
+            lblTreibstoff.setText(f.getTreibstoffArt().toString());
+            lblKm.setText(String.valueOf(f.getKmStand()));
+            lblPs.setText(String.valueOf(f.getLeistungsPs()));
+            lblDatum.setText(f.getErstzulassung().toString());
+            lblFarbe.setText(f.getAussenfarbe());
+            lblGewicht.setText(String.valueOf(f.getLeergewicht()));
+
+            if (f instanceof Auto a) {
+                lblAufbau.setText(a.getAufbauArt().toString());
+                lblNavigation.setText(a.hasNavigation().toString());
+                cardLayout.show(pnlType, "AUTO");
+
+            } else if (f instanceof Transporter t) {
+                lblZuladung.setText(String.valueOf(t.getMaxZuladungInKg()));
+                cardLayout.show(pnlType, "TRANSPORTER");
             }
         });
 
-        btnKunden.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                txaMain.setText("Kunden: ");
-            }
+        // ADD AUTO
+        btnAddAuto.addActionListener(e -> {
+            JDialog d = new JDialog(frame, "Auto hinzufügen", true);
+            d.setSize(350, 400);
+            d.setLayout(new GridLayout(0, 2, 5, 5));
+
+            JTextField txtMarke = new JTextField();
+            JTextField txtModell = new JTextField();
+            JTextField txtHubraum = new JTextField();
+            JComboBox<TreibstoffArt> cmbTreibstoff = new JComboBox<>(TreibstoffArt.values());
+            JTextField txtKm = new JTextField();
+            JTextField txtPs = new JTextField();
+            JTextField txtDatum = new JTextField();
+            JTextField txtFarbe = new JTextField();
+            JTextField txtGewicht = new JTextField();
+            JComboBox<AufbauArt> cmbAufbau = new JComboBox<>(AufbauArt.values());
+            JComboBox<Navigationssystem> cmbNav = new JComboBox<>(Navigationssystem.values());
+
+            JButton btnOk = new JButton("Hinzufügen");
+
+            d.add(new JLabel("Marke")); d.add(txtMarke);
+            d.add(new JLabel("Modell")); d.add(txtModell);
+            d.add(new JLabel("Hubraum")); d.add(txtHubraum);
+            d.add(new JLabel("Treibstoff")); d.add(cmbTreibstoff);
+            d.add(new JLabel("KM")); d.add(txtKm);
+            d.add(new JLabel("PS")); d.add(txtPs);
+            d.add(new JLabel("Datum")); d.add(txtDatum);
+            d.add(new JLabel("Farbe")); d.add(txtFarbe);
+            d.add(new JLabel("Gewicht")); d.add(txtGewicht);
+            d.add(new JLabel("Aufbau")); d.add(cmbAufbau);
+            d.add(new JLabel("Navigation")); d.add(cmbNav);
+            d.add(new JLabel()); d.add(btnOk);
+
+            btnOk.addActionListener(ev -> {
+                try {
+                    Auto a = new Auto(
+                            model.getNextFahrzeugId(),
+                            txtMarke.getText(),
+                            txtModell.getText(),
+                            Integer.parseInt(txtHubraum.getText()),
+                            (TreibstoffArt) cmbTreibstoff.getSelectedItem(),
+                            Integer.parseInt(txtKm.getText()),
+                            Integer.parseInt(txtPs.getText()),
+                            LocalDate.parse(txtDatum.getText(), DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                            txtFarbe.getText(),
+                            Integer.parseInt(txtGewicht.getText()),
+                            (AufbauArt) cmbAufbau.getSelectedItem(),
+                            (Navigationssystem) cmbNav.getSelectedItem()
+                    );
+                    model.addFahrzeug(a);
+                    listModel.addElement(a);
+                    d.dispose();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(d, "Eingabefehler");
+                }
+            });
+
+            d.setLocationRelativeTo(frame);
+            d.setVisible(true);
         });
 
+        // ADD TRANSPORTER
+        btnAddTransporter.addActionListener(e -> {
+            JDialog d = new JDialog(frame, "Transporter hinzufügen", true);
+            d.setSize(350, 350);
+            d.setLayout(new GridLayout(0, 2, 5, 5));
 
-        // Actionlistener für Add Auto Button
-        btnAddFahrzeug.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JDialog dialogAdd = new JDialog(frame, "Fahrzeug hinzufügen", true);
-                dialogAdd.setSize(300, 400);
-                dialogAdd.setLocationRelativeTo(null);
-                dialogAdd.setLayout(new GridLayout(0, 2, 5, 5));
+            JTextField txtMarke = new JTextField();
+            JTextField txtModell = new JTextField();
+            JTextField txtHubraum = new JTextField();
+            JComboBox<TreibstoffArt> cmbTreibstoff = new JComboBox<>(TreibstoffArt.values());
+            JTextField txtKm = new JTextField();
+            JTextField txtPs = new JTextField();
+            JTextField txtDatum = new JTextField();
+            JTextField txtFarbe = new JTextField();
+            JTextField txtGewicht = new JTextField();
+            JTextField txtZuladung = new JTextField();
 
-                JLabel lblMarke = new JLabel("Marke: ");
-                JTextField txtMarke = new JTextField();
+            JButton btnOk = new JButton("Hinzufügen");
 
-                JLabel lblModell = new JLabel("Modell: ");
-                JTextField txtModell = new JTextField();
+            d.add(new JLabel("Marke")); d.add(txtMarke);
+            d.add(new JLabel("Modell")); d.add(txtModell);
+            d.add(new JLabel("Hubraum")); d.add(txtHubraum);
+            d.add(new JLabel("Treibstoff")); d.add(cmbTreibstoff);
+            d.add(new JLabel("KM")); d.add(txtKm);
+            d.add(new JLabel("PS")); d.add(txtPs);
+            d.add(new JLabel("Datum")); d.add(txtDatum);
+            d.add(new JLabel("Farbe")); d.add(txtFarbe);
+            d.add(new JLabel("Gewicht")); d.add(txtGewicht);
+            d.add(new JLabel("Zuladung")); d.add(txtZuladung);
+            d.add(new JLabel()); d.add(btnOk);
 
-                JLabel lblHubraum = new JLabel("Hubraum [ccm]: ");
-                JTextField txtHubraum = new JTextField();
+            btnOk.addActionListener(ev -> {
+                try {
+                    Transporter t = new Transporter(
+                            model.getNextFahrzeugId(),
+                            txtMarke.getText(),
+                            txtModell.getText(),
+                            Integer.parseInt(txtHubraum.getText()),
+                            (TreibstoffArt) cmbTreibstoff.getSelectedItem(),
+                            Integer.parseInt(txtKm.getText()),
+                            Integer.parseInt(txtPs.getText()),
+                            LocalDate.parse(txtDatum.getText(), DateTimeFormatter.ofPattern("dd.MM.yyyy")),
+                            txtFarbe.getText(),
+                            Integer.parseInt(txtGewicht.getText()),
+                            Integer.parseInt(txtZuladung.getText())
+                    );
+                    model.addFahrzeug(t);
+                    listModel.addElement(t);
+                    d.dispose();
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(d, "Eingabefehler");
+                }
+            });
 
-                JLabel lblTreibstoffart = new JLabel("Treibstoffart: ");
-                JComboBox<TreibstoffArt> cmbTreibstoffart = new JComboBox<>(TreibstoffArt.values());
-
-                JLabel lblKmStand = new JLabel("Aktueller Km-Stand: ");
-                JTextField txtKmStand = new JTextField();
-
-                JLabel lblLeistung = new JLabel("Leistung [PS]: ");
-                JTextField txtLeistung = new JTextField();
-
-                JLabel lblErstzulassungsdatum = new JLabel("Erstzulassungsdatum: ");
-                JTextField txtErstzulassungsdatum = new JTextField();
-
-                JLabel lblAussenfarbe = new JLabel("Aussenfarbe: ");
-                JTextField txtAussenfarbe = new JTextField();
-
-                JLabel lblLehrgewicht = new JLabel("Lehrgewicht [kg]: ");
-                JTextField txtLehrgewicht = new JTextField();
-
-                JLabel lblAufbau = new JLabel("Aufbau: ");
-                JComboBox<AufbauArt> cmbAufbau = new JComboBox<>(AufbauArt.values());
-
-                JLabel lblNavigation = new JLabel("Navigationssystem: ");
-                JComboBox<Navigationssystem> cmbNavigation = new JComboBox<>(Navigationssystem.values());
-
-
-                dialogAdd.add(lblMarke);
-                dialogAdd.add(txtMarke);
-                dialogAdd.add(lblModell);
-                dialogAdd.add(txtModell);
-                dialogAdd.add(lblHubraum);
-                dialogAdd.add(txtHubraum);
-                dialogAdd.add(lblTreibstoffart);
-                dialogAdd.add(cmbTreibstoffart);
-                dialogAdd.add(lblKmStand);
-                dialogAdd.add(txtKmStand);
-                dialogAdd.add(lblLeistung);
-                dialogAdd.add(txtLeistung);
-                dialogAdd.add(lblErstzulassungsdatum);
-                dialogAdd.add(txtErstzulassungsdatum);
-                dialogAdd.add(lblAussenfarbe);
-                dialogAdd.add(txtAussenfarbe);
-                dialogAdd.add(lblLehrgewicht);
-                dialogAdd.add(txtLehrgewicht);
-                dialogAdd.add(lblAufbau);
-                dialogAdd.add(cmbAufbau);
-                dialogAdd.add(lblNavigation);
-                dialogAdd.add(cmbNavigation);
-
-                dialogAdd.setVisible(true);
-            }
-        });
-
-        // Actionslistener für Add Transporter Button
-        btnAddTransporter.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JDialog dialogAdd = new JDialog(frame, "Fahrzeug hinzufügen", true);
-                dialogAdd.setSize(350, 400);
-                dialogAdd.setLocationRelativeTo(null);
-                dialogAdd.setLayout(new GridLayout(0, 2, 5, 5));
-
-                JLabel lblMarke = new JLabel("Marke: ");
-                JTextField txtMarke = new JTextField();
-
-                JLabel lblModell = new JLabel("Modell: ");
-                JTextField txtModell = new JTextField();
-
-                JLabel lblHubraum = new JLabel("Hubraum [ccm]: ");
-                JTextField txtHubraum = new JTextField();
-
-                JLabel lblTreibstoffart = new JLabel("Treibstoffart: ");
-                JComboBox<TreibstoffArt> cmbTreibstoffart = new JComboBox<>(TreibstoffArt.values());
-
-                JLabel lblKmStand = new JLabel("Aktueller Km-Stand: ");
-                JTextField txtKmStand = new JTextField();
-
-                JLabel lblLeistung = new JLabel("Leistung [PS]: ");
-                JTextField txtLeistung = new JTextField();
-
-                JLabel lblErstzulassungsdatum = new JLabel("Erstzulassungsdatum: ");
-                JTextField txtErstzulassungsdatum = new JTextField();
-
-                JLabel lblAussenfarbe = new JLabel("Aussenfarbe: ");
-                JTextField txtAussenfarbe = new JTextField();
-
-                JLabel lblLehrgewicht = new JLabel("Lehrgewicht [kg]: ");
-                JTextField txtLehrgewicht = new JTextField();
-
-                JLabel lblMaxZuladung = new JLabel("Maximale Zuladung [kg]: ");
-                JTextField txtMaxZuladung = new JTextField();
-
-
-                dialogAdd.add(lblMarke);
-                dialogAdd.add(txtMarke);
-                dialogAdd.add(lblModell);
-                dialogAdd.add(txtModell);
-                dialogAdd.add(lblHubraum);
-                dialogAdd.add(txtHubraum);
-                dialogAdd.add(lblTreibstoffart);
-                dialogAdd.add(cmbTreibstoffart);
-                dialogAdd.add(lblKmStand);
-                dialogAdd.add(txtKmStand);
-                dialogAdd.add(lblLeistung);
-                dialogAdd.add(txtLeistung);
-                dialogAdd.add(lblErstzulassungsdatum);
-                dialogAdd.add(txtErstzulassungsdatum);
-                dialogAdd.add(lblAussenfarbe);
-                dialogAdd.add(txtAussenfarbe);
-                dialogAdd.add(lblLehrgewicht);
-                dialogAdd.add(txtLehrgewicht);
-                dialogAdd.add(lblMaxZuladung);
-                dialogAdd.add(txtMaxZuladung);
-
-                dialogAdd.setVisible(true);
-            }
+            d.setLocationRelativeTo(frame);
+            d.setVisible(true);
         });
 
         frame.setVisible(true);

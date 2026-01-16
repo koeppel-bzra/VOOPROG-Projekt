@@ -1,6 +1,7 @@
 package model;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Date;
 
 public abstract class Fahrzeug implements Serializable {
@@ -11,15 +12,22 @@ public abstract class Fahrzeug implements Serializable {
     private TreibstoffArt treibstoffArt;
     private int kmStand;
     private int leistungsPs;
-    private Date erstzulassung;
+    private LocalDate erstzulassung;
     private String aussenfarbe;
     private int leergewicht;
 
 
-    public Fahrzeug(int fahrzeugId, String marke, String modell) {
+    public Fahrzeug(int fahrzeugId, String marke, String modell, int hubraum, TreibstoffArt treibstoffArt, int kmStand, int leistungsPs, LocalDate erstzulassung, String aussenfarbe, int leergewicht) {
         this.fahrzeugId = fahrzeugId;
         this.marke = marke;
         this.modell = modell;
+        this.hubraum = hubraum;
+        this.treibstoffArt = treibstoffArt;
+        this.kmStand = kmStand;
+        this.leistungsPs = leistungsPs;
+        this.erstzulassung = erstzulassung;
+        this.aussenfarbe = aussenfarbe;
+        this.leergewicht = leergewicht;
     }
 
     public String toString() {
@@ -83,11 +91,11 @@ public abstract class Fahrzeug implements Serializable {
         this.leistungsPs = leistungsPs;
     }
 
-    public Date getErstzulassung() {
+    public LocalDate getErstzulassung() {
         return erstzulassung;
     }
 
-    public void setErstzulassung(Date erstzulassung) {
+    public void setErstzulassung(LocalDate erstzulassung) {
         this.erstzulassung = erstzulassung;
     }
 
