@@ -1,12 +1,15 @@
 package view;
 
+import infrastructure.FahrzeugRepo;
 import model.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.List;
 
 public class MainFrame {
 
@@ -20,6 +23,7 @@ public class MainFrame {
         frame.setLayout(new BorderLayout());
 
         CarManageModel model = new CarManageModel();
+        FahrzeugRepo fahrzeugRepo = new FahrzeugRepo();
 
         // TOP TITLE
         JLabel lblTop = new JLabel("IdealCar4You - Verwaltung", SwingConstants.CENTER);
@@ -33,12 +37,14 @@ public class MainFrame {
         JButton btnFahrzeuge = new JButton("Fahrzeuge ⬇");
         JButton btnAddAuto = new JButton("Auto hinzufügen");
         JButton btnAddTransporter = new JButton("Transporter hinzufügen");
+        JButton btnDeleteVehicle = new JButton("Fahrzeug entfernen");
 
         JPanel pnlSub = new JPanel();
         pnlSub.setLayout(new BoxLayout(pnlSub, BoxLayout.Y_AXIS));
         pnlSub.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0));
         pnlSub.add(btnAddAuto);
         pnlSub.add(btnAddTransporter);
+        pnlSub.add(btnDeleteVehicle);
 
         btnFahrzeuge.addActionListener(e -> {
             pnlSub.setVisible(!pnlSub.isVisible());
@@ -148,14 +154,53 @@ public class MainFrame {
 
             if (f instanceof Auto a) {
                 lblAufbau.setText(a.getAufbauArt().toString());
-                lblNavigation.setText(a.hasNavigation().toString());
+                lblNavigation.setText(a.getNavigation().toString());
                 cardLayout.show(pnlType, "AUTO");
 
             } else if (f instanceof Transporter t) {
                 lblZuladung.setText(String.valueOf(t.getMaxZuladungInKg()));
                 cardLayout.show(pnlType, "TRANSPORTER");
             }
+
         });
+
+        // Fahrzeug löschen
+
+        btnDeleteVehicle.addActionListener(e -> {
+            Fahrzeug selected = lstFahrzeuge.getSelectedValue();
+
+            if (selected == null) {
+                JOptionPane.showMessageDialog(frame, "Bitte ein Fahrzeug auswählen");
+            }
+
+            else {
+                int confirm = JOptionPane.showConfirmDialog(frame, "Willst du das Fahrzeug wirklich löschen?", "Löschen bestätigen", JOptionPane.YES_NO_OPTION);
+
+                if (confirm == JOptionPane.YES_OPTION) {
+                    model.deleteFahrzeug(selected);
+                    listModel.removeElement(selected);
+
+                    fahrzeugRepo.saveAutos(model.getAutos());
+                    fahrzeugRepo.saveTransporter(model.getTransporter());
+                }
+            }
+        });
+
+
+
+        List<Auto> autos = fahrzeugRepo.loadAutos();;
+        List<Transporter> transporter = fahrzeugRepo.loadTransporter();
+
+        for (Auto a : autos) {
+            model.addFahrzeug(a);
+            listModel.addElement(a);
+        }
+
+        for (Transporter t : transporter) {
+            model.addFahrzeug(t);
+            listModel.addElement(t);
+        }
+
 
         // ADD AUTO
         btnAddAuto.addActionListener(e -> {
@@ -208,6 +253,9 @@ public class MainFrame {
                     );
                     model.addFahrzeug(a);
                     listModel.addElement(a);
+
+                    fahrzeugRepo.saveAutos(model.getAutos());
+
                     d.dispose();
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(d, "Eingabefehler");
@@ -265,6 +313,9 @@ public class MainFrame {
                             Integer.parseInt(txtZuladung.getText())
                     );
                     model.addFahrzeug(t);
+
+                    fahrzeugRepo.saveTransporter(model.getTransporter());
+
                     listModel.addElement(t);
                     d.dispose();
                 } catch (Exception ex) {

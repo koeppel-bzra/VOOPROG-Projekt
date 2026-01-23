@@ -7,42 +7,27 @@ import java.util.List;
 
 public class FahrzeugController {
     private CarManageModel model;
-    private Benutzer aktuellerBenutzer;
     private FahrzeugRepo fahrzeugRepo;
 
-    public FahrzeugController(CarManageModel model, Benutzer aktuellerBenutzer, FahrzeugRepo fahrzeugRepo) {
+    public FahrzeugController(CarManageModel model, FahrzeugRepo fahrzeugRepo) {
         this.model = model;
-        this.aktuellerBenutzer = aktuellerBenutzer;
         this.fahrzeugRepo = fahrzeugRepo;
     }
 
+    // Fahrzeug hinzufügen
     public void addFahrzeug(Fahrzeug fahrzeug) {
-        if (aktuellerBenutzer.getRolle() != Rolle.FAHRZEUGMANAGER &&
-            aktuellerBenutzer.getRolle() != Rolle.ADMIN) {
-            throw new SecurityException("Keine Berechtigung");
-        }
         model.addFahrzeug(fahrzeug);
     }
 
-    public void deleteFahrzeug(Fahrzeug fahrzeug) {
-        if (aktuellerBenutzer.getRolle() != Rolle.FAHRZEUGMANAGER ||
-                aktuellerBenutzer.getRolle() != Rolle.ADMIN) {
-            throw new SecurityException("Keine Berechtigung");
-        }
-        model.deleteFahrzeug(fahrzeug);
-    }
-
-
-
-    public List<Fahrzeug> sucheFahrzeug(String marke, String modell) {
-        return model.sucheFahrzeug(marke, modell);
-    }
-
+    // Alle Fahrzeuge zurückgeben
     public List<Fahrzeug> alleFahrzeuge() {
-        return model.getFahrzeug();
+        return model.getFahrzeuge();
     }
 
+    // Speichern
     public void speichern() {
-        fahrzeugRepo.saveFahrzeuge(model.getFahrzeug());
+        // getrennt speichern, damit JSON sauber bleibt
+        fahrzeugRepo.saveAutos(model.getAutos());
+        fahrzeugRepo.saveTransporter(model.getTransporter());
     }
 }

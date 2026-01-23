@@ -16,19 +16,4 @@ public class KundenController {
         this.kundenRepo = kundenRepo;
     }
 
-    public void addKunde(Kunde kunde) {
-        model.addKunde(kunde);
-    }
-
-    public void deleteKunde(Kunde kunde) {
-        model.deleteKunde(kunde);
-    }
-
-    public List<Kunde> alleKunden() {
-        return model.getKunden();
-    }
-
-    public void speichern() {
-        kundenRepo.saveKunden(model.getKunden());
-    }
 }

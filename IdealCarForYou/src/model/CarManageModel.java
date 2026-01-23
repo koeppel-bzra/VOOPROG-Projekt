@@ -1,69 +1,52 @@
 package model;
 
+import model.Auto;
+import model.Transporter;
+import model.Fahrzeug;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class CarManageModel {
-    private ArrayList<Fahrzeug> fahrzeuge;
-    private ArrayList<Kunde> kunden;
-    private ArrayList<Benutzer> benutzer;
-
-    private int fahrzeugIdCounter = 1;
-    private int kundenIdCounter = 1;
+    private List<Fahrzeug> fahrzeuge;
 
     public CarManageModel() {
-        this.fahrzeuge = new ArrayList<>();
-        this.kunden = new ArrayList<>();
-        this.benutzer = new ArrayList<>();
+        fahrzeuge = new ArrayList<>();
     }
 
-
-    public int getNextFahrzeugId() {
-        return fahrzeugIdCounter++;
+    public void addFahrzeug(Fahrzeug f) {
+        fahrzeuge.add(f);
     }
 
-    public List<Fahrzeug> getFahrzeug() {
+    public List<Fahrzeug> getFahrzeuge() {
         return fahrzeuge;
     }
 
-    public void addFahrzeug(Fahrzeug fahrzeug) {
-        fahrzeuge.add(fahrzeug);
+    public void deleteFahrzeug(Fahrzeug f) {
+        fahrzeuge.remove(f);
     }
 
-    public void deleteFahrzeug(Fahrzeug fahrzeug) {
-        fahrzeuge.remove(fahrzeug);
-    }
-
-    public List<Fahrzeug> sucheFahrzeug(String marke, String modell) {
-        List<Fahrzeug> result = new ArrayList<>();
-
+    public List<Auto> getAutos() {
+        List<Auto> autos = new ArrayList<>();
         for (Fahrzeug f : fahrzeuge) {
-            if (f.getMarke().equalsIgnoreCase(marke) && f.getModell().equalsIgnoreCase(modell)) {
-                result.add(f);
-            }
+            if (f instanceof Auto a) autos.add(a);
         }
-        return result;
+        return autos;
     }
 
-
-    public int getNextKundenId() {
-        return kundenIdCounter++;
+    public List<Transporter> getTransporter() {
+        List<Transporter> transporter = new ArrayList<>();
+        for (Fahrzeug f : fahrzeuge) {
+            if (f instanceof Transporter t) transporter.add(t);
+        }
+        return transporter;
     }
 
-    public List<Kunde> getKunden() {
-        return kunden;
-    }
-
-    public void addKunde(Kunde kunde) {
-        kunden.add(kunde);
-    }
-
-    public void deleteKunde(Kunde kunde) {
-        kunden.remove(kunde);
-    }
-
-
-    public List<Benutzer> getBenutzer() {
-        return benutzer;
+    public int getNextFahrzeugId() {
+        int max = 0;
+        for (Fahrzeug f : fahrzeuge) {
+            if (f.getFahrzeugId() > max) max = f.getFahrzeugId();
+        }
+        return max + 1;
     }
 }
